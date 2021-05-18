@@ -10,18 +10,17 @@ import (
 var db *gorm.DB
 var err error
 
-
-type Users struct {
-	id int 'json:"id"'
-	username string 'json:"username"'
-	password string 'json:"password"'
-	name string 'json:"name"'
+type User struct {
+	Id       int    `json:"id"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Name     string `json:"name"`
 }
 
 type Result struct {
-	code int 'json:"code"'
-	data interface{} 'json:"data"'
-	message string 'json:"message"'
+	Code    int         `json:"code"`
+	Data    interface{} `json:"data"`
+	Message string      `json:"message"`
 }
 
 func main() {
@@ -33,5 +32,5 @@ func main() {
 		fmt.Println("Connection Established")
 	}
 
-	// db.AutoMigrate(&Users{})
+	db.AutoMigrate(&User{})
 }
