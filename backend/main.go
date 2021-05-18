@@ -48,6 +48,7 @@ func handleRequests() {
 	fmt.Println("Running...")
 	myRoute := mux.NewRouter().StrictSlash(true)
 
+	myRoute.HandleFunc("/user", viewUser).Methods("GET")
 	myRoute.HandleFunc("/user", addUser).Methods("POST")
 	myRoute.HandleFunc("/user/{id}", updateUser).Methods("PUT")
 	myRoute.HandleFunc("/user/{limit}/{offset}", getUsers).Methods("GET")
@@ -133,11 +134,28 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func getUsers(w http.ResponseWriter, r *http.Request) {
-	var users = []User{}
+func viewUser(w http.ResponseWriter, r *http.Request) {
 
+	var users = []User{}
 	db.Find(&users)
-	res := Result{Code: 200, Data: users, Message: "Success Get Products"}
+	res := Result{Code: 200, Data: users, Message: "Success Get Users"}
+	result, err := json.Marshal(res)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(result)
+}
+
+func getUsers(w http.ResponseWriter, r *http.Request) {
+	varr := mux.Vars(r)
+	limit := varr["limit"]
+
+	var users = []User{}
+	db.Limit(limit).Find(&users)
+	res := Result{Code: 200, Data: users, Message: "Success Get Users"}
 	result, err := json.Marshal(res)
 
 	if err != nil {
@@ -154,7 +172,7 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 	var user User
 	db.First(&user, userId)
 
-	res := Result{Code: 200, Data: user, Message: "Success Get Product"}
+	res := Result{Code: 200, Data: user, Message: "Success Get User"}
 	result, err := json.Marshal(res)
 
 	if err != nil {

@@ -1,0 +1,95 @@
+{
+	"variables": [],
+	"info": {
+		"name": "sharingvision",
+		"_postman_id": "a3e0ab5a-69fb-a2d8-f034-506fcac14394",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get-User-With-ID",
+			"request": {
+				"url": "http://localhost:2121/user/2",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "update user"
+			},
+			"response": []
+		},
+		{
+			"name": "Insert-Users",
+			"request": {
+				"url": "http://localhost:2121/user",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"ac\",\n\t\"password\" : \"1234567\",\n\t\"name\" : \"agung pras\"\n}"
+				},
+				"description": "Add User"
+			},
+			"response": []
+		},
+		{
+			"name": "Update-User-With-ID",
+			"request": {
+				"url": "http://localhost:2121/user/2",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"acu\",\n\t\"password\" : \"1234567\",\n\t\"name\" : \"agung pras\"\n}"
+				},
+				"description": "Update User"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete-User-With-ID",
+			"request": {
+				"url": "http://localhost:2121/user/1",
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"description": "DeleteUser"
+			},
+			"response": []
+		},
+		{
+			"name": "Get-User-Pagination",
+			"request": {
+				"url": "http://localhost:2121/user/2",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "View User"
+			},
+			"response": []
+		},
+		{
+			"name": "List-All-Users",
+			"request": {
+				"url": "http://localhost:2121/user",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		}
+	]
+}
