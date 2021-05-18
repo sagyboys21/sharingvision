@@ -84,10 +84,52 @@ func addUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userId := vars["id"]
 
+	payloads, _ := ioutil.ReadAll(r.Body)
+
+	var userUpdates User
+	json.Unmarshal(payloads, &userUpdates)
+
+	validate := validator.New()
+	err := validate.Struct(userUpdates)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		var user User
+		db.First(&user, userId)
+		db.Model(&user).Updates(userUpdates)
+		// message success
+		res2 := Result{Code: 200, Data: user, Message: "User Updated"}
+		result, err2 := json.Marshal(res2)
+		if err2 != nil {
+			http.Error(w, err2.Error(), http.StatusInternalServerError)
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(result)
+	}
 }
 
 func deleteUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userId := vars["id"]
+
+	var user User
+	db.First(&user, userId)
+	db.Delete(&user)
+
+	// message success
+	res2 := Result{Code: 200, Data: user, Message: "User Deleted"}
+	result, err2 := json.Marshal(res2)
+	if err2 != nil {
+		http.Error(w, err2.Error(), http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(result)
 
 }
 
