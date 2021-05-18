@@ -38,20 +38,23 @@ func main() {
 		fmt.Println("Connection Established")
 	}
 
-	handleRequests()
 	// migrate table user
 	db.AutoMigrate(&User{})
 
+	handleRequests()
+
 }
 func handleRequests() {
-	fmt.Println("Running at port 9999")
+	fmt.Println("Running...")
 	myRoute := mux.NewRouter().StrictSlash(true)
 
-	myRoute.HandleFunc("/getuser", getUser)
-	myRoute.HandleFunc("/adduser", addUser).Methods("POST")
-	myRoute.HandleFunc("/getuser", getUser).Methods("GET")
+	myRoute.HandleFunc("/user", addUser).Methods("POST")
+	myRoute.HandleFunc("/user/{id}", updateUser).Methods("PUT")
+	myRoute.HandleFunc("/user/{limit}/{offset}", getUsers).Methods("GET")
+	myRoute.HandleFunc("/user/{id}", deleteUser).Methods("DELETE")
+	myRoute.HandleFunc("/user/{id}", getUser).Methods("GET")
 
-	log.Fatal(http.ListenAndServe(":9999", myRoute))
+	log.Fatal(http.ListenAndServe(":2121", myRoute))
 }
 
 func addUser(w http.ResponseWriter, r *http.Request) {
@@ -60,36 +63,35 @@ func addUser(w http.ResponseWriter, r *http.Request) {
 	var user User
 	json.Unmarshal(payloads, &user)
 
-	// user := User{
-	// 	Username: "",
-	// 	Password: "",
-	// 	Name:     "agungcoba",
-	// }
-
 	validate := validator.New()
 	err := validate.Struct(user)
 
-	// message error
-	res1 := Result{Code: 212, Data: user, Message: err.Error()}
-	resulterr, err1 := json.Marshal(res1)
-	// message success
-	res2 := Result{Code: 200, Data: user, Message: "User Created"}
-	result, err := json.Marshal(res2)
-
-	if err1 == nil {
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	} else {
+		db.Create(&user)
+		// message success
+		res2 := Result{Code: 200, Data: user, Message: "User Created"}
+		result, err2 := json.Marshal(res2)
+		if err2 != nil {
+			http.Error(w, err2.Error(), http.StatusInternalServerError)
+		}
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write(resulterr)
+		w.WriteHeader(http.StatusOK)
+		w.Write(result)
 	}
-
-	db.Create(&user)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(result)
 
 }
 
-func getUser(w http.ResponseWriter, r *http.Request) {
+func updateUser(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func deleteUser(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func getUsers(w http.ResponseWriter, r *http.Request) {
 	var users = []User{}
 
 	db.Find(&users)
@@ -102,4 +104,22 @@ func getUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(result)
+}
+
+func getUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userId := vars["id"]
+	var user User
+	db.First(&user, userId)
+
+	res := Result{Code: 200, Data: user, Message: "Success Get Product"}
+	result, err := json.Marshal(res)
+
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write(result)
+
 }
